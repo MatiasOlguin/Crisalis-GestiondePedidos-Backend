@@ -24,20 +24,19 @@ public class Pedido implements Serializable {
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @Column(name = "monto_total")
-    private Double montoTotal;
-
-    @ManyToOne( cascade = CascadeType.ALL)
-    @JoinColumn(name="cliente_id")
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    @OneToMany( cascade = CascadeType.ALL)
-    @JoinColumn(name="pedido_id")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "pedido_id")
     private List<Item> items;
 
-    public Pedido(){
-        this.items= new ArrayList<>();
-        this.estado= Estado.EN_REVISION;
+    private Double total;
+
+    public Pedido() {
+        this.items = new ArrayList<>();
+        this.estado = Estado.EN_REVISION;
     }
 
     @PrePersist
@@ -69,14 +68,6 @@ public class Pedido implements Serializable {
         this.estado = estado;
     }
 
-    public Double getMontoTotal() {
-        return montoTotal;
-    }
-
-    public void setMontoTotal(Double montoTotal) {
-        this.montoTotal = montoTotal;
-    }
-
     public Cliente getCliente() {
         return cliente;
     }
@@ -91,5 +82,15 @@ public class Pedido implements Serializable {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public void addItem(Item item){ items.add(item); }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 }

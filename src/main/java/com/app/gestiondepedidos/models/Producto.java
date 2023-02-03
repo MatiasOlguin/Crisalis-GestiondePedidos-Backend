@@ -1,16 +1,11 @@
 package com.app.gestiondepedidos.models;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@DiscriminatorValue(value = "producto")
-
-public class Producto extends Oferta implements Serializable {
+@Table(name="productos")
+public class Producto extends Oferta implements Serializable{
     private String marca;
     private String modelo;
     private Integer cantidad;
@@ -38,5 +33,4 @@ public class Producto extends Oferta implements Serializable {
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
-
 }

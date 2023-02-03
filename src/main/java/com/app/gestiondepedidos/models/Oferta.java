@@ -1,17 +1,15 @@
 package com.app.gestiondepedidos.models;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
-@Entity
-@Table(name = "ofertas")
-@DiscriminatorColumn(name = "oferta_tipo")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Oferta implements Serializable {
+@MappedSuperclass
+public class Oferta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String descripcion;
+
     @Column(name = "monto_base")
     private Double montoBase;
 

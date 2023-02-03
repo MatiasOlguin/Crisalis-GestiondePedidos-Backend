@@ -7,7 +7,7 @@ import java.util.List;
 
 public class EmpresaMapper {
 
-    public static EmpresaDTO crearDTO(Empresa empresa) {
+    public static EmpresaDTO crearEmpresaDTO(Empresa empresa) {
         EmpresaDTO tempDTO = new EmpresaDTO();
         tempDTO.setId(empresa.getId());
         tempDTO.setRazonSocial(empresa.getRazonSocial());

@@ -11,12 +11,12 @@ public class PedidoDTO {
     private Long id;
     private Date createAt;
     private String estado;
-    private Double montoTotal;
+    private Double total;
     private ClienteNombreCompletoDTO cliente;
     private List<Item> items;
 
-    public PedidoDTO (){
-        items=new ArrayList<>();
+    public PedidoDTO() {
+        items = new ArrayList<>();
     }
 
     public Long getId() {
@@ -43,14 +43,6 @@ public class PedidoDTO {
         this.estado = estado;
     }
 
-    public Double getMontoTotal() {
-        return montoTotal;
-    }
-
-    public void setMontoTotal(Double montoTotal) {
-        this.montoTotal = montoTotal;
-    }
-
     public ClienteNombreCompletoDTO getCliente() {
         return cliente;
     }
@@ -65,5 +57,13 @@ public class PedidoDTO {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 }

@@ -1,8 +1,8 @@
 package com.app.gestiondepedidos.controllers;
 
-import com.app.gestiondepedidos.dto.ClienteDTO;
 import com.app.gestiondepedidos.dto.EmpresaDTO;
 import com.app.gestiondepedidos.dto.EmpresaMapper;
+import com.app.gestiondepedidos.models.Cliente;
 import com.app.gestiondepedidos.models.Empresa;
 import com.app.gestiondepedidos.services.IClienteService;
 import com.app.gestiondepedidos.services.IEmpresaService;
@@ -25,86 +25,85 @@ public class EmpresaController {
     private IClienteService empleadoService;
 
 
-    @GetMapping("")
-    public List<EmpresaDTO> index() {
-        List<EmpresaDTO> lista= new ArrayList<>();
-        List<Empresa> temp=empresaService.findAll();
+    @GetMapping
+    public ResponseEntity<List<EmpresaDTO>> index() {
+        List<Empresa> temp = empresaService.findAll();
 
-        for(int i=0; i < temp.size(); i++){
-            lista.add(EmpresaMapper.crearDTO(temp.get(i)));
+        if (temp.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        List<EmpresaDTO> empresas = new ArrayList<>();
+
+        for (int i = 0; i < temp.size(); i++) {
+            EmpresaDTO aux = EmpresaMapper.crearEmpresaDTO(temp.get(i));
+            empresas.add(aux);
         }
 
-        return lista;
+        return new ResponseEntity<>(empresas, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public EmpresaDTO show(@PathVariable Long id) {
-        return EmpresaMapper.crearDTO(empresaService.findById(id).orElse(null));
+    public ResponseEntity<EmpresaDTO> show(@PathVariable Long id) {
+        Optional<Empresa> empresaOpt = empresaService.findById(id);
+
+        if (!empresaOpt.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        EmpresaDTO empresa = EmpresaMapper.crearEmpresaDTO(empresaOpt.get());
+
+        return new ResponseEntity<>(empresa, HttpStatus.OK);
     }
 
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Empresa create(@RequestBody EmpresaDTO empresaDTO) {
-        Empresa empresa=new Empresa();
-
-        empresa.setRazonSocial(empresaDTO.getRazonSocial());
-        empresa.setCuit(empresaDTO.getCuit());
-        empresa.setInicioActividades(empresaDTO.getInicioActividades());
-
-
-        return empresaService.save(empresa);
+    @PostMapping
+    public ResponseEntity<Empresa> create(@RequestBody Empresa empresa) {
+        Empresa empresaCreada = empresaService.save(empresa);
+        return new ResponseEntity<>(empresaCreada, HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Empresa> addEmpleado(@PathVariable Long id, @RequestBody ClienteDTO empleado) {
-        Optional <Empresa> empresaOpt= empresaService.findById(id);
+    public ResponseEntity<Empresa> addEmpleado(@PathVariable Long id, @RequestBody Cliente cliente) {
+        Optional<Empresa> empresaOpt = empresaService.findById(id);
+        Optional<Cliente> empleadoOpt = empleadoService.findById(cliente.getId());
 
-        if (!empresaOpt.isPresent()) {
+        if (!empresaOpt.isPresent() || !empleadoOpt.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Empresa empresa= empresaOpt.get();
+        Empresa empresa = empresaOpt.get();
+        Cliente empleado = empleadoOpt.get();
 
-        empresa.addEmpleados(empleadoService.findById(empleado.getId()).get());
-        empresa=empresaService.save(empresa);
+        empresa.addEmpleados(empleado);
 
         return new ResponseEntity<>(empresa, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Empresa update(@RequestBody EmpresaDTO empresaDTO, @PathVariable Long id) {
-        Empresa empresaActual = empresaService.findById(id).orElse(null);
+    public ResponseEntity<Empresa> update(@RequestBody Empresa empresa, @PathVariable Long id) {
+        Optional<Empresa> empresaOpt = empresaService.findById(id);
 
-        empresaActual.setRazonSocial(empresaDTO.getRazonSocial());
-        empresaActual.setCuit(empresaDTO.getCuit());
-        empresaActual.setInicioActividades(empresaDTO.getInicioActividades());
+        if (!empresaOpt.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return empresaService.save(empresaActual);
+        Empresa empresaActual= empresaOpt.get();
+
+        empresaActual.setRazonSocial(empresa.getRazonSocial());
+        empresaActual.setCuit(empresa.getCuit());
+        empresaActual.setInicioActividades(empresa.getInicioActividades());
+
+        empresaService.save(empresaActual);
+
+        return new ResponseEntity<>(empresaActual, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete (@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Optional<Empresa> empresaOpt = empresaService.findById(id);
+
+        if (!empresaOpt.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         empresaService.delete(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
-
-//    @PutMapping("/{id}")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public Cliente update(@RequestBody Cliente cliente, @PathVariable Long id){
-//        Cliente clienteActual= clienteService.findById(id).orElse(null);
-//
-//        clienteActual.setNombre(cliente.getNombre());
-//        clienteActual.setApellido(cliente.getApellido());
-//        clienteActual.setDni(cliente.getDni());
-//
-//        return clienteService.save(clienteActual);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void delete (@PathVariable Long id){
-//        clienteService.delete(id);
-//    }

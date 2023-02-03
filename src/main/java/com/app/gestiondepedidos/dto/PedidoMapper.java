@@ -13,7 +13,7 @@ public class PedidoMapper {
         pedidoDTO.setId(pedido.getId());
         pedidoDTO.setEstado(pedido.getEstado().getEstado());
         pedidoDTO.setCreateAt(pedido.getCreateAt());
-        pedidoDTO.setMontoTotal(pedido.getMontoTotal());
+        pedidoDTO.setTotal(pedido.getTotal());
         pedidoDTO.setCliente(ClienteMapper.crearClienteNombreCompletoDTO(pedido.getCliente()));
 
         if (!Objects.isNull(pedido.getItems()))

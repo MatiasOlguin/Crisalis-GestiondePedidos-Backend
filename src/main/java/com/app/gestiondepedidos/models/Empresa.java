@@ -1,6 +1,8 @@
 package com.app.gestiondepedidos.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -30,7 +32,7 @@ public class Empresa implements Serializable {
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private Date createAt;
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "empresa")
     @JsonIgnore
     private Set<Cliente> empleados;
 

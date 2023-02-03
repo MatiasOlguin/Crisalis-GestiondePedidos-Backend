@@ -21,16 +21,20 @@ public class PedidoController {
     private IPedidoService pedidoService;
 
     @GetMapping
-    public List<PedidoDTO> index() {
-        List<Pedido> temp = pedidoService.findAll();
-        List<PedidoDTO> lista = new ArrayList<>();
+    public ResponseEntity<List<PedidoDTO>> index() {
+        List<Pedido> temp=pedidoService.findAll();
 
-        for (int i = 0; i < temp.size(); i++) {
-            PedidoDTO aux = PedidoMapper.crearPedidoDTO(temp.get(i));
-            lista.add(aux);
+        if (temp.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        return lista;
+        List<PedidoDTO> pedidos= new ArrayList<>();
+
+        for(int i = 0; i < temp.size(); i++){
+            PedidoDTO aux= PedidoMapper.crearPedidoDTO(temp.get(i));
+            pedidos.add(aux);
+        }
+        return new ResponseEntity<>(pedidos, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
@@ -49,59 +53,20 @@ public class PedidoController {
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Pedido create(@RequestBody Pedido pedido) {
-        return pedidoService.save(pedido);
+    public ResponseEntity<Pedido> create(@RequestBody Pedido pedido) {
+        Pedido pedidoCreado= pedidoService.save(pedido);
+        return new ResponseEntity<>(pedidoCreado, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Optional<Pedido> pedidoOpt = pedidoService.findById(id);
+
+        if (!pedidoOpt.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        pedidoService.delete(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
-
-//@RestController
-//@RequestMapping("/clientes")
-//public class ClienteController {
-//
-//    @Autowired
-//    private IClienteService clienteService;
-//
-//    @GetMapping("")
-//    public List<ClienteDTO> index() {
-//        List<Cliente> temp=clienteService.findAll();
-//        List<ClienteDTO> lista= new ArrayList<>();
-//
-//        for(int i = 0; i < temp.size(); i++){
-//            ClienteDTO aux= ClienteMapper.crearDTO(temp.get(i));
-//            lista.add(aux);
-//        }
-//
-//        return lista;
-//    }
-//
-//    @GetMapping("{id}")
-//    public Cliente show (@PathVariable Long id){
-//        return clienteService.findById(id).orElse(null);
-//    }
-//
-//    @PostMapping("")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public Cliente create (@RequestBody Cliente cliente){
-//        return clienteService.save(cliente);
-//    }
-//
-//    @PutMapping("/{id}")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public Cliente update(@RequestBody Cliente cliente, @PathVariable Long id){
-//        Cliente clienteActual= clienteService.findById(id).orElse(null);
-//
-//        clienteActual.setNombre(cliente.getNombre());
-//        clienteActual.setApellido(cliente.getApellido());
-//        clienteActual.setDni(cliente.getDni());
-//
-//        return clienteService.save(clienteActual);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void delete (@PathVariable Long id){
-//        clienteService.delete(id);
-//    }
-//}

@@ -1,7 +1,9 @@
 package com.app.gestiondepedidos.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.action.internal.OrphanRemovalAction;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,7 +36,6 @@ public class Cliente implements Serializable {
     private List<Pedido> pedidos;
 
     public Cliente() {
-        empresa = new Empresa();
         pedidos = new ArrayList<>();
     }
 
