@@ -17,7 +17,7 @@ public class EmpresaServiceImpl implements IEmpresaService {
     @Override
     @Transactional(readOnly = true)
     public List<Empresa> findAll() {
-        return (List<Empresa>) empresaRepository.findAll();
+        return empresaRepository.findByBorradoFalse();
     }
 
     @Override
@@ -37,4 +37,10 @@ public class EmpresaServiceImpl implements IEmpresaService {
     public void delete(Long id) {
         empresaRepository.deleteById(id);
     }
+    @Override
+    @Transactional
+    public void borradoLogico(Empresa empresa){
+        empresa.setBorrado(true);
+        empresaRepository.save(empresa);
+    };
 }

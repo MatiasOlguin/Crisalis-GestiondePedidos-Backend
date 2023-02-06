@@ -1,7 +1,7 @@
 package com.app.gestiondepedidos.enums;
 
 public enum Estado {
-    EN_REVISION("En revision"),
+    EN_REVISION("En revisión"),
     ACEPTADO("Aceptado"),
     CANCELADO("Cancelado");
 

@@ -102,8 +102,20 @@ public class EmpresaController {
         if (!empresaOpt.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        empresaService.delete(id);
+        empresaService.borradoLogico(empresaOpt.get());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        Optional<Empresa> empresaOpt = empresaService.findById(id);
+//
+//        if (!empresaOpt.isPresent())
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//
+//        empresaService.delete(id);
+//
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }

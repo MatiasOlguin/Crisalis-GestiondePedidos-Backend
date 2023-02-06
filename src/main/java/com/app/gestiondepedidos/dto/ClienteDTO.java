@@ -1,8 +1,10 @@
 package com.app.gestiondepedidos.dto;
 
 import com.app.gestiondepedidos.models.Empresa;
+import com.app.gestiondepedidos.models.ServicioActivo;
 
 import java.util.Date;
+import java.util.List;
 
 public class ClienteDTO {
     private Long id;
@@ -12,6 +14,8 @@ public class ClienteDTO {
     private Date createAt;
 
     private EmpresaRazonSocialDTO empresa;
+
+    private List<ServicioActivo> servicios;
 
     public Long getId() {
         return id;
@@ -58,5 +62,13 @@ public class ClienteDTO {
 
     public void setEmpresa(EmpresaRazonSocialDTO empresa) {
         this.empresa = empresa;
+    }
+
+    public List<ServicioActivo> getServicios() {
+        return servicios;
+    }
+
+    public void setServicios(List<ServicioActivo> servicios) {
+        this.servicios = servicios;
     }
 }

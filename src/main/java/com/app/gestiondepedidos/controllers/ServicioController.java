@@ -1,5 +1,6 @@
 package com.app.gestiondepedidos.controllers;
 
+import com.app.gestiondepedidos.models.Producto;
 import com.app.gestiondepedidos.models.Servicio;
 import com.app.gestiondepedidos.services.IServicioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +73,21 @@ public class ServicioController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        servicioService.delete(id);
+        servicioService.borradoLogico(servicioOpt.get());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        Optional<Servicio> servicioOpt = servicioService.findById(id);
+//
+//        if (!servicioOpt.isPresent()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        servicioService.delete(id);
+//
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }

@@ -70,6 +70,7 @@ public class ProductoController {
         return new ResponseEntity<>(productoActual, HttpStatus.OK);
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Optional<Producto> productoOpt = productoService.findById(id);
@@ -78,8 +79,21 @@ public class ProductoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        productoService.delete(id);
+        productoService.borradoLogico(productoOpt.get());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        Optional<Producto> productoOpt = productoService.findById(id);
+//
+//        if (!productoOpt.isPresent()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        productoService.delete(id);
+//
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }

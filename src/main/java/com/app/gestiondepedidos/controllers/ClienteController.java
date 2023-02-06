@@ -81,8 +81,21 @@ public class ClienteController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        clienteService.delete(id);
+        clienteService.borradoLogico(clienteOpt.get());
 
         return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete (@PathVariable Long id){
+//        Optional<Cliente> clienteOpt= clienteService.findById(id);
+//
+//        if (!clienteOpt.isPresent()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        clienteService.delete(id);
+//
+//        return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }

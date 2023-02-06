@@ -1,5 +1,6 @@
 package com.app.gestiondepedidos.services;
 
+import com.app.gestiondepedidos.models.Producto;
 import com.app.gestiondepedidos.models.Servicio;
 import com.app.gestiondepedidos.repositories.ServicioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class ServicioServiceImpl implements IServicioService {
     @Override
     @Transactional(readOnly = true)
     public List<Servicio> findAll() {
-        return (List<Servicio>) servicioRepository.findAll();
+        return servicioRepository.findByBorradoFalse();
     }
 
     @Override
@@ -30,6 +31,13 @@ public class ServicioServiceImpl implements IServicioService {
     @Transactional
     public Servicio save(Servicio servicio) {
         return servicioRepository.save(servicio);
+    }
+
+    @Override
+    @Transactional
+    public void borradoLogico(Servicio servicio) {
+        servicio.setBorrado(true);
+        servicioRepository.save(servicio);
     }
 
     @Override

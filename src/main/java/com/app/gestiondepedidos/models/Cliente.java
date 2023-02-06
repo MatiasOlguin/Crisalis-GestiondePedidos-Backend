@@ -1,9 +1,7 @@
 package com.app.gestiondepedidos.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.action.internal.OrphanRemovalAction;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -35,8 +33,16 @@ public class Cliente implements Serializable {
     @JsonIgnore
     private List<Pedido> pedidos;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cliente_id")
+    private List<ServicioActivo> servicios;
+
+    @JsonIgnore
+    private boolean borrado;
+
     public Cliente() {
         pedidos = new ArrayList<>();
+        borrado= false;
     }
 
     @PrePersist
@@ -92,6 +98,14 @@ public class Cliente implements Serializable {
         this.empresa = empresa;
     }
 
+    public boolean isBorrado() {
+        return borrado;
+    }
+
+    public void setBorrado(boolean borrado) {
+        this.borrado = borrado;
+    }
+
     public List<Pedido> getPedidos() {
         return pedidos;
     }
@@ -103,4 +117,14 @@ public class Cliente implements Serializable {
     public void addPedido(Pedido pedido) {
         pedidos.add(pedido);
     }
+
+    public List<ServicioActivo> getServicios() {
+        return servicios;
+    }
+
+    public void setServicios(List<ServicioActivo> servicios) {
+        this.servicios = servicios;
+    }
+
+    public void addServicio(ServicioActivo servicio){servicios.add(servicio);}
 }

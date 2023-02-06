@@ -36,8 +36,12 @@ public class Empresa implements Serializable {
     @JsonIgnore
     private Set<Cliente> empleados;
 
+    @JsonIgnore
+    private boolean borrado;
+
     public Empresa() {
         empleados = new HashSet<Cliente>();
+        borrado=false;
     }
 
     @PrePersist
@@ -75,6 +79,14 @@ public class Empresa implements Serializable {
 
     public void setCuit(String cuit) {
         this.cuit = cuit;
+    }
+
+    public boolean isBorrado() {
+        return borrado;
+    }
+
+    public void setBorrado(boolean borrado) {
+        this.borrado = borrado;
     }
 
     public Set<Cliente> getEmpleados() {

@@ -1,11 +1,13 @@
 package com.app.gestiondepedidos.services;
 
+import com.app.gestiondepedidos.enums.Estado;
 import com.app.gestiondepedidos.models.*;
 import com.app.gestiondepedidos.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,13 +16,15 @@ public class PedidoServiceImpl implements IPedidoService {
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
-    private ClienteRepository clienteRepository;
+    private IClienteService clienteService;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
     private IProductoService productoService;
     @Autowired
-    private ServicioRepository servicioRepository;
+    private IServicioService servicioService;
+    @Autowired
+    private IServicioActivoService servicioActivoService;
     @Autowired
     private CalculosService calculosService;
 
@@ -40,7 +44,7 @@ public class PedidoServiceImpl implements IPedidoService {
     @Override
     @Transactional
     public Pedido save(Pedido pedido) {
-        Cliente cliente = clienteRepository.findById(pedido.getCliente().getId()).get();
+        Cliente cliente = clienteService.findById(pedido.getCliente().getId()).get();
         Pedido nuevoPedido = new Pedido();
 
         nuevoPedido.setCliente(cliente);
@@ -56,36 +60,34 @@ public class PedidoServiceImpl implements IPedidoService {
                 nuevoItem.setProducto(producto);
                 nuevoItem.setCantidad(pedido.getItems().get(i).getCantidad());
                 nuevoItem.setSubtotal(pedido.getItems().get(i).getProducto().getMontoBase() * pedido.getItems().get(i).getCantidad());
+                nuevoItem.setIVA(calculosService.calcularImpuesto(0.21, nuevoItem.getSubtotal()));
+                nuevoItem.setIIBB(calculosService.calcularImpuesto(0.035, nuevoItem.getSubtotal()));
+                nuevoItem.setTotal((nuevoItem.getSubtotal() + nuevoItem.getIVA() + nuevoItem.getIIBB()));
 
                 if (pedido.getItems().get(i).getAniosGarantia() != null) {
                     nuevoItem.setAniosGarantia(pedido.getItems().get(i).getAniosGarantia());
-                    nuevoItem.setAdicional(nuevoItem.getSubtotal() * 0.02 * nuevoItem.getAniosGarantia());
-                    nuevoItem.setSubtotal((nuevoItem.getSubtotal() + nuevoItem.getAdicional()));
+                    nuevoItem.setAdicional(nuevoItem.getTotal() * 0.02 * nuevoItem.getAniosGarantia());
+                    nuevoItem.setTotal(nuevoItem.getTotal() + nuevoItem.getAdicional());
                 }
-
-                nuevoItem.setIVA(calculosService.calcularImpuesto(0.21, nuevoItem.getSubtotal()));
-                nuevoItem.setIIBB(calculosService.calcularImpuesto(0.035, nuevoItem.getSubtotal()));
-
-                nuevoItem.setTotal((nuevoItem.getSubtotal() + nuevoItem.getIVA() + nuevoItem.getIIBB()));
 
                 itemRepository.save(nuevoItem);
                 nuevoPedido.addItem(nuevoItem);
 
             } else {
-                Servicio servicio = servicioRepository.findById(pedido.getItems().get(i).getServicio().getId()).get();
+                Servicio servicio = servicioService.findById(pedido.getItems().get(i).getServicio().getId()).get();
 
                 nuevoItem.setServicio(servicio);
                 nuevoItem.setCantidad(1);
                 nuevoItem.setSubtotal(pedido.getItems().get(i).getServicio().getMontoBase());
-
                 nuevoItem.setIVA(calculosService.calcularImpuesto(0.21, nuevoItem.getSubtotal()));
                 nuevoItem.setIIBB(calculosService.calcularImpuesto(0.035, nuevoItem.getSubtotal()));
+                nuevoItem.setTotal(nuevoItem.getSubtotal() + nuevoItem.getIVA() + nuevoItem.getIIBB());
 
                 if (pedido.getItems().get(i).getAdicional() != null) {
                     nuevoItem.setAdicional(pedido.getItems().get(i).getAdicional());
-                    nuevoItem.setTotal(nuevoItem.getSubtotal() + nuevoItem.getIVA() + nuevoItem.getIIBB() + nuevoItem.getAdicional());
-                } else
-                    nuevoItem.setTotal(nuevoItem.getSubtotal() + nuevoItem.getIVA() + nuevoItem.getIIBB());
+                    nuevoItem.setTotal(nuevoItem.getTotal() + nuevoItem.getAdicional());
+                }
+
 
                 itemRepository.save(nuevoItem);
                 nuevoPedido.addItem(nuevoItem);
@@ -102,15 +104,57 @@ public class PedidoServiceImpl implements IPedidoService {
     public void delete(Long id) {
         Pedido pedido = pedidoRepository.findById(id).get();
 
-        for (int i = 0; i < pedido.getItems().size(); i++) {
-
-            if (!pedido.getItems().get(i).productoEsVacio()) {
-                Producto producto = productoService.findById(pedido.getItems().get(i).getProducto().getId()).get();
-                producto.setCantidad(producto.getCantidad() + pedido.getItems().get(i).getCantidad());
-                productoService.save(producto);
+        if (pedido.getEstado() != Estado.CANCELADO) {
+            for (int i = 0; i < pedido.getItems().size(); i++) {
+                if (!pedido.getItems().get(i).productoEsVacio()) {
+                    Producto producto = productoService.findById(pedido.getItems().get(i).getProducto().getId()).get();
+                    producto.setCantidad(producto.getCantidad() + pedido.getItems().get(i).getCantidad());
+                    productoService.save(producto);
+                }
             }
         }
 
         pedidoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void actualizarEstado(Long id, String estado) {
+        Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
+
+        if (pedidoOpt.isPresent()) {
+            Pedido pedido = pedidoOpt.get();
+            if (estado.equals("CANCELADO")) {
+                pedido.setEstado(Estado.CANCELADO);
+                for (int i = 0; i < pedido.getItems().size(); i++) {
+
+                    if (!pedido.getItems().get(i).productoEsVacio()) {
+                        Producto producto = productoService.findById(pedido.getItems().get(i).getProducto().getId()).get();
+                        producto.setCantidad(producto.getCantidad() + pedido.getItems().get(i).getCantidad());
+                        productoService.save(producto);
+                    }
+                }
+                pedidoRepository.save(pedido);
+            }
+
+            if (estado.equals("ACEPTADO")) {
+                pedido.setEstado(Estado.ACEPTADO);
+                pedidoRepository.save(pedido);
+
+                List<Servicio> servicios = new ArrayList<>();
+
+                for (int i = 0; i < pedido.getItems().size(); i++) {
+                    if (pedido.getItems().get(i).productoEsVacio()) {
+                        servicios.add(pedido.getItems().get(i).getServicio());
+                    }
+                }
+
+                if (!servicios.isEmpty()) {
+                    for (Servicio servicio : servicios) {
+                        clienteService.activarServicio(pedido.getCliente().getId(), servicio);
+                    }
+                }
+            }
+        }
     }
 }

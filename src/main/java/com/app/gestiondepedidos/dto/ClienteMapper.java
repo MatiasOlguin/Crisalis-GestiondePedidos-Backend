@@ -15,6 +15,7 @@ public class ClienteMapper {
         clienteDTO.setApellido(cliente.getApellido());
         clienteDTO.setDni(cliente.getDni());
         clienteDTO.setCreateAt(cliente.getCreateAt());
+        clienteDTO.setServicios(cliente.getServicios());
 
         if (!Objects.isNull(cliente.getEmpresa())) {
             EmpresaRazonSocialDTO aux=new EmpresaRazonSocialDTO();

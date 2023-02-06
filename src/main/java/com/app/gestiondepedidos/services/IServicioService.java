@@ -9,4 +9,5 @@ public interface IServicioService {
     public Optional<Servicio> findById(Long id);
     public Servicio save(Servicio servicio);
     public void delete(Long id);
+    public void borradoLogico(Servicio servicio);
 }

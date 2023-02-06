@@ -1,5 +1,6 @@
 package com.app.gestiondepedidos.services;
 
+import com.app.gestiondepedidos.enums.Estado;
 import com.app.gestiondepedidos.models.Pedido;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface IPedidoService {
     public Optional<Pedido> findById(Long id);
     public Pedido save(Pedido pedido);
     public void delete(Long id);
+    public void actualizarEstado(Long id, String estado);
 }

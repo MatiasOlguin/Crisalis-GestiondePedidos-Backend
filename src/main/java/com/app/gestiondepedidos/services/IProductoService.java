@@ -9,5 +9,6 @@ public interface IProductoService {
     public Optional<Producto> findById(Long id);
     public Producto save(Producto producto);
     public void delete(Long id);
+    public void borradoLogico(Producto producto);
     public void actualizarCantidad(Long id, int cantidad);
 }

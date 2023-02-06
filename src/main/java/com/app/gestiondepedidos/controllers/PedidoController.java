@@ -2,6 +2,7 @@ package com.app.gestiondepedidos.controllers;
 
 import com.app.gestiondepedidos.dto.PedidoDTO;
 import com.app.gestiondepedidos.dto.PedidoMapper;
+import com.app.gestiondepedidos.enums.Estado;
 import com.app.gestiondepedidos.models.Pedido;
 import com.app.gestiondepedidos.services.IPedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoDTO, HttpStatus.OK);
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<Pedido> create(@RequestBody Pedido pedido) {
         Pedido pedidoCreado= pedidoService.save(pedido);
         return new ResponseEntity<>(pedidoCreado, HttpStatus.CREATED);
@@ -66,6 +67,13 @@ public class PedidoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         pedidoService.delete(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/{estado}")
+    public ResponseEntity<Void> actualizarEstado(@PathVariable Long id,@PathVariable String estado){
+        pedidoService.actualizarEstado(id, estado);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -16,7 +16,7 @@ public class ProductoServiceImpl implements IProductoService{
     @Override
     @Transactional(readOnly = true)
     public List<Producto> findAll() {
-        return (List<Producto>) productoRepository.findAll();
+        return productoRepository.findByBorradoFalse();
     }
 
     @Override
@@ -35,6 +35,13 @@ public class ProductoServiceImpl implements IProductoService{
     @Transactional
     public void delete(Long id) {
         productoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void borradoLogico(Producto producto) {
+        producto.setBorrado(true);
+        productoRepository.save(producto);
     }
 
      @Override
